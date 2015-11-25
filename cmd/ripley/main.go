@@ -5,7 +5,6 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -17,19 +16,17 @@ import (
 	"github.com/satyrius/gonx"
 )
 
-const Version = "0.1.0"
-
-const DefaultLogFormat = `$remote_addr - $remote_user [$time_local] "$request" $status $body_bytes_sent "$http_referer" "$http_user_agent"`
+const (
+	Version          = "0.1.1"
+	DefaultLogFormat = `$remote_addr - $remote_user [$time_local] "$request" $status $body_bytes_sent "$http_referer" "$http_user_agent"`
+)
 
 type Opts struct {
 	addr   string
 	ignore bool
 }
 
-type Stats struct {
-}
-
-func worker(queue chan string, opts Opts, wg *sync.WaitGroup) {
+func worker(queue chan string, out chan string, opts Opts, wg *sync.WaitGroup) {
 	defer wg.Done()
 
 	for link := range queue {
@@ -37,6 +34,14 @@ func worker(queue chan string, opts Opts, wg *sync.WaitGroup) {
 		start := time.Now()
 		resp, err := http.Get(link)
 		duration := time.Since(start)
+
+		if err != nil {
+			if opts.ignore {
+				log.Println(err)
+			} else {
+				log.Fatal(err)
+			}
+		}
 
 		b, err := json.Marshal(map[string]interface{}{
 			"url":     link,
@@ -46,19 +51,20 @@ func worker(queue chan string, opts Opts, wg *sync.WaitGroup) {
 		if err != nil {
 			log.Fatal(err)
 		}
-		fmt.Println(string(b))
+		out <- string(b)
 
 		if resp.StatusCode >= 400 && !opts.ignore {
 			log.Fatalf("%v", resp)
 		}
-		if err != nil && !opts.ignore {
-			log.Fatal(err)
-		}
-		if _, err = ioutil.ReadAll(resp.Body); err != nil && !opts.ignore {
-			log.Fatal(err)
-		}
 		resp.Body.Close()
 	}
+}
+
+func writer(out chan string, done chan bool) {
+	for s := range out {
+		fmt.Println(s)
+	}
+	done <- true
 }
 
 func main() {
@@ -79,13 +85,16 @@ func main() {
 	reader := gonx.NewReader(os.Stdin, DefaultLogFormat)
 
 	queue := make(chan string)
-	var wg sync.WaitGroup
+	out := make(chan string)
+	done := make(chan bool)
+	go writer(out, done)
 
 	opts := Opts{addr: *addr, ignore: *ignore}
+	var wg sync.WaitGroup
 
 	for i := 0; i < *w; i++ {
 		wg.Add(1)
-		go worker(queue, opts, &wg)
+		go worker(queue, out, opts, &wg)
 	}
 
 	for {
@@ -126,9 +135,10 @@ func main() {
 		} else {
 			log.Println(link)
 		}
-
 	}
 
 	close(queue)
 	wg.Wait()
+	close(out)
+	<-done
 }
