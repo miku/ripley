@@ -30,7 +30,6 @@ func worker(queue chan string, out chan string, opts Opts, wg *sync.WaitGroup) {
 	defer wg.Done()
 
 	for link := range queue {
-
 		start := time.Now()
 		resp, err := http.Get(link)
 		duration := time.Since(start)
@@ -98,13 +97,17 @@ func main() {
 	}
 
 	for {
+		// TODO(miku): factor nginx part out, so this become a general query tool
 		rec, err := reader.Read()
+
 		if err == io.EOF {
 			break
 		}
 		if err != nil {
 			log.Fatal(err)
 		}
+
+		// get the request field
 		f, err := rec.Field("request")
 		if err != nil {
 			log.Fatal(err)
@@ -119,13 +122,14 @@ func main() {
 		replacer := strings.NewReplacer("GET ", "", "HTTP/1.1", "", "HTTP/1.0", "")
 		p := replacer.Replace(f)
 
-		// only consider solr requests
+		// only consider solr select
 		if !strings.HasPrefix(p, "/solr/biblio/select") {
 			continue
 		}
 
 		link := path.Join(*addr, p)
 
+		// prepend http if necessary
 		if !strings.HasPrefix(link, "http") && *addr != "" {
 			link = "http://" + link
 		}
