@@ -17,18 +17,18 @@ import (
 )
 
 const (
-	Version   = "0.1.1"
-	LogFormat = `$remote_addr - $remote_user [$time_local] "$request" $status $body_bytes_sent "$http_referer" "$http_user_agent"`
+	Version = "0.1.1"
+	format  = `$remote_addr - $remote_user [$time_local] "$request" $status $body_bytes_sent "$http_referer" "$http_user_agent"`
 )
 
 var replacer = strings.NewReplacer("GET ", "", "HTTP/1.1", "", "HTTP/1.0", "")
 
-type Opts struct {
+type options struct {
 	addr   string
 	ignore bool
 }
 
-func worker(queue chan string, out chan string, opts Opts, wg *sync.WaitGroup) {
+func worker(queue chan string, out chan string, opts options, wg *sync.WaitGroup) {
 	defer wg.Done()
 	for link := range queue {
 		start := time.Now()
@@ -54,9 +54,11 @@ func worker(queue chan string, out chan string, opts Opts, wg *sync.WaitGroup) {
 		out <- string(b)
 
 		if resp.StatusCode >= 400 && !opts.ignore {
-			log.Fatalf("%v", resp)
+			log.Fatal(resp)
 		}
-		resp.Body.Close()
+		if err := resp.Body.Close(); err != nil {
+			log.Fatal(err)
+		}
 	}
 }
 
@@ -81,14 +83,14 @@ func main() {
 		os.Exit(0)
 	}
 
-	reader := gonx.NewReader(os.Stdin, LogFormat)
+	reader := gonx.NewReader(os.Stdin, format)
 
 	queue := make(chan string)
 	out := make(chan string)
 	done := make(chan bool)
 	go writer(out, done)
 
-	opts := Opts{addr: *addr, ignore: *ignore}
+	opts := options{addr: *addr, ignore: *ignore}
 	var wg sync.WaitGroup
 
 	for i := 0; i < *w; i++ {
