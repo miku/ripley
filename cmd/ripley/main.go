@@ -17,8 +17,8 @@ import (
 )
 
 const (
-	Version          = "0.1.1"
-	DefaultLogFormat = `$remote_addr - $remote_user [$time_local] "$request" $status $body_bytes_sent "$http_referer" "$http_user_agent"`
+	Version   = "0.1.1"
+	LogFormat = `$remote_addr - $remote_user [$time_local] "$request" $status $body_bytes_sent "$http_referer" "$http_user_agent"`
 )
 
 type Opts struct {
@@ -81,7 +81,7 @@ func main() {
 		os.Exit(0)
 	}
 
-	reader := gonx.NewReader(os.Stdin, DefaultLogFormat)
+	reader := gonx.NewReader(os.Stdin, LogFormat)
 
 	queue := make(chan string)
 	out := make(chan string)
