@@ -8,7 +8,15 @@ Download Linux 64-bit binary: [ripley](https://github.com/miku/ripley/releases/d
 Usage
 -----
 
-Use `-addr` to point to a SOLR to warm up. Use `-run` flag to actually run the queries.
+Input log format is the default nginx combined [format](https://github.com/miku/ripley/blob/8437e9bd241eb2605b0c6132095d4fdf84db0e82/cmd/ripley/main.go#L21):
+
+    $ zcat log-20151124.gz
+    112.101.12.10 - - [23/Nov/2015:11:01:50 +0100] "GET /solr/biblio/select?q=%28hello+world HTTP/1.1" 200 43 "-" "So.."
+    ...
+
+We expect the `/solr/biblio/select` prefix.
+
+Use `-addr` to point to a SOLR to warm up, `-run` flag to actually run the queries.
 
     $ zcat log-20151124.gz | ripley -addr 10.10.110.7:8085 -run
     {"elapsed":0.270542267,"status":"200 OK","url":"http://172..."}
