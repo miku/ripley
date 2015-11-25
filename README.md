@@ -13,9 +13,9 @@ Use `-addr` to point to a SOLR to warm up. Use `-run` flag to actually run the q
     {"elapsed":0.287049684,"status":"200 OK","url":"http://172..."}
     ...
 
-Run queries in parallel with `-w` parameter:
+If `-ignore` is set, continue in the case of HTTP errors. Run queries in parallel with `-w` parameter:
 
-    $ zcat log-20151124.gz | ripley -addr 10.10.110.7:8085 -w 8 -run
+    $ zcat log-20151124.gz | ripley -addr 10.10.110.7:8085 -ignore -w 8 -run
     {"elapsed":0.270542267,"status":"200 OK","url":"http://172..."}
     {"elapsed":0.287049684,"status":"200 OK","url":"http://172..."}
     ...
