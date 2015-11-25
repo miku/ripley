@@ -21,6 +21,8 @@ const (
 	LogFormat = `$remote_addr - $remote_user [$time_local] "$request" $status $body_bytes_sent "$http_referer" "$http_user_agent"`
 )
 
+var replacer = strings.NewReplacer("GET ", "", "HTTP/1.1", "", "HTTP/1.0", "")
+
 type Opts struct {
 	addr   string
 	ignore bool
@@ -28,7 +30,6 @@ type Opts struct {
 
 func worker(queue chan string, out chan string, opts Opts, wg *sync.WaitGroup) {
 	defer wg.Done()
-
 	for link := range queue {
 		start := time.Now()
 		resp, err := http.Get(link)
@@ -97,7 +98,6 @@ func main() {
 	}
 
 	for {
-		// TODO(miku): factor nginx part out, so this become a general query tool
 		rec, err := reader.Read()
 
 		if err == io.EOF {
@@ -113,24 +113,20 @@ func main() {
 			log.Fatal(err)
 		}
 
-		// skip non GET requests
 		if !strings.HasPrefix(f, "GET") {
 			continue
 		}
 
-		// extract path
-		replacer := strings.NewReplacer("GET ", "", "HTTP/1.1", "", "HTTP/1.0", "")
+		// we only want the path
 		p := replacer.Replace(f)
 
-		// only consider solr select
 		if !strings.HasPrefix(p, "/solr/biblio/select") {
 			continue
 		}
 
 		link := path.Join(*addr, p)
 
-		// prepend http if necessary
-		if !strings.HasPrefix(link, "http") && *addr != "" {
+		if !strings.HasPrefix(link, "http") {
 			link = "http://" + link
 		}
 
