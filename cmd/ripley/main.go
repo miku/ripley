@@ -68,7 +68,6 @@ func writer(out chan string, done chan bool) {
 }
 
 func main() {
-
 	addr := flag.String("addr", "", "hostport of SOLR to query, e.g. 10.1.1.7:8085 or https://10.1.1.8:1234")
 	run := flag.Bool("run", false, "actually run the requests")
 	ignore := flag.Bool("ignore", false, "ignore errors")
@@ -107,7 +106,6 @@ func main() {
 			log.Fatal(err)
 		}
 
-		// get the request field
 		f, err := rec.Field("request")
 		if err != nil {
 			log.Fatal(err)
