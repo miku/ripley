@@ -17,6 +17,8 @@ import (
 	"github.com/satyrius/gonx"
 )
 
+const Version = "0.1.0"
+
 const DefaultLogFormat = `$remote_addr - $remote_user [$time_local] "$request" $status $body_bytes_sent "$http_referer" "$http_user_agent"`
 
 type Opts struct {
@@ -65,8 +67,14 @@ func main() {
 	run := flag.Bool("run", false, "actually run the requests")
 	ignore := flag.Bool("ignore", false, "ignore errors")
 	w := flag.Int("w", 1, "number of requests to run in parallel")
+	version := flag.Bool("v", false, "show version and exit")
 
 	flag.Parse()
+
+	if *version {
+		fmt.Println(Version)
+		os.Exit(0)
+	}
 
 	reader := gonx.NewReader(os.Stdin, DefaultLogFormat)
 
