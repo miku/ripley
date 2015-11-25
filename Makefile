@@ -4,5 +4,3 @@ ripley: cmd/ripley/main.go
 
 clean:
 	rm -f ripley
-
-	
