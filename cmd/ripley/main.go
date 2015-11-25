@@ -61,7 +61,7 @@ func worker(queue chan string, opts Opts, wg *sync.WaitGroup) {
 
 func main() {
 
-	addr := flag.String("addr", "", "hostport of SOLR to query")
+	addr := flag.String("addr", "", "hostport of SOLR to query, e.g. 10.1.1.7:8085 or https://10.1.1.8:1234")
 	run := flag.Bool("run", false, "actually run the requests")
 	ignore := flag.Bool("ignore", false, "ignore errors")
 	w := flag.Int("w", 1, "number of requests to run in parallel")
