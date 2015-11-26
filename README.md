@@ -11,7 +11,7 @@ Usage
 Input log format is the default nginx combined [format](https://github.com/miku/ripley/blob/8437e9bd241eb2605b0c6132095d4fdf84db0e82/cmd/ripley/main.go#L21):
 
     $ zcat log-20151124.gz
-    112.101.12.10 - - [23/Nov/2015:11:01:50 +0100] "GET /solr/biblio/select?q=%28hello+world HTTP/1.1" 200 43 "-" "So.."
+    112.101.12.10 - - [23/Nov/2015:11:01:50 +0100] "GET /solr/biblio/select?q=%28hi HTTP/1.1" 200 43 "-" "SLR"
     ...
 
 We expect the `/solr/biblio/select` prefix.
