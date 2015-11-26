@@ -3,7 +3,7 @@ README
 
 Replay SOLR queries parsed from nginx logs.
 
-Download Linux 64-bit binary: [ripley](https://github.com/miku/ripley/releases/download/v0.1.2/ripley).
+Download Linux 64-bit binary: [ripley](https://github.com/miku/ripley/releases/download/v0.1.3/ripley).
 
 Usage
 -----
