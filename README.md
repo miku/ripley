@@ -44,3 +44,9 @@ To get timing information out (in seconds), use [jq](https://stedolan.github.io/
     0.24043798600000002
     0.240256606
     ...
+
+If you need stats, you might want [st](https://github.com/nferraz/st) or something like it:
+
+    $ zcat log-20151124.gz | ripley -ignore -w 4 -addr 10.10.110.7:8085 -run | jq -r '.elapsed' | st
+    N       min         max     sum     mean    stddev  stderr
+    2220    0.00110086  118.637 5548.31 2.49924 10.0882 0.214111
