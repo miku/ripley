@@ -17,7 +17,7 @@ import (
 )
 
 const (
-	Version = "0.1.2"
+	Version = "0.1.3"
 	format  = `$remote_addr - $remote_user [$time_local] "$request" $status $body_bytes_sent "$http_referer" "$http_user_agent"`
 )
 
