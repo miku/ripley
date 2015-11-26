@@ -38,6 +38,7 @@ func worker(queue chan string, out chan string, opts options, wg *sync.WaitGroup
 		if err != nil {
 			if opts.ignore {
 				log.Println(err)
+				continue
 			} else {
 				log.Fatal(err)
 			}
